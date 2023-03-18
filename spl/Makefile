@@ -1,5 +1,6 @@
 CC = riscv64-unknown-elf-gcc
 LD = riscv64-unknown-elf-ld
+PYTHON = python3
 OBJCOPY = riscv64-unknown-elf-objcopy
 CFLAGS = -O0
 
@@ -13,10 +14,11 @@ LINKER_SCRIPT = $(wildcard *.ld)
 
 INCLUDE = ./include
 
-all: image
+all: spl.bin
 
-image: spl.elf
-	riscv64-unknown-elf-objcopy spl.elf -O binary image 
+spl.bin: spl.elf
+	$(OBJCOPY) spl.elf -O binary image.raw
+	$(PYTHON) ./scripts/gen_checksum.py image.raw spl.bin
 
 spl.elf: $(C_OBJ) $(ASM_OBJ)
 	$(LD) $(CFLAGS) -T $(LINKER_SCRIPT) -o spl.elf $(C_OBJ) $(ASM_OBJ)
@@ -28,5 +30,7 @@ $(ASM_OBJ):%.o:%.S
 	$(CC) $(CFLAGS) -o $@ -I$(INCLUDE) -c $<
 
 clean:
-	rm *.o 2> /dev/null
-	rm spl.elf 2> /dev/null
+	rm -f *.o
+	rm -f spl.elf
+	rm -f image.raw
+	rm -f spl.bin

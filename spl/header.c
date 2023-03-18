@@ -1,39 +1,9 @@
-/*
- * (C) Copyright 2018
- * SPDX-License-Identifier: GPL-2.0+
- * wangwei <wangwei@allwinnertech.com>
- */
-/// File instrumented by Yancheng Ou 
-#include "boot0-header.h"
-/** 
- * this is the information of the commit we used in 
- * https://github.com/smaeul/sun20i_d1_spl 
- * More detailed: 
- * https://github.com/smaeul/sun20i_d1_spl/commit/882671fcf53137aaafc3a94fa32e682cb7b921f1 
- */
-#define CI_INFO "882671f-dirty"
-#ifdef CFG_ARCH_RISCV
+// This is the header provided by AllWinner SDK
+// Put in the start of spl image
+// Starting at 8K from the start of the SD card.
+#include <defs.h>
 
-#define BROM_FILE_HEAD_SIZE         (sizeof(boot0_file_head_t) & 0x00FFFFF)
-#define BROM_FILE_HEAD_BIT_10_1     ((BROM_FILE_HEAD_SIZE & 0x7FE) >> 1)
-#define BROM_FILE_HEAD_BIT_11       ((BROM_FILE_HEAD_SIZE & 0x800) >> 11)
-#define BROM_FILE_HEAD_BIT_19_12    ((BROM_FILE_HEAD_SIZE & 0xFF000) >> 12)
-#define BROM_FILE_HEAD_BIT_20       ((BROM_FILE_HEAD_SIZE & 0x100000) >> 20)
-
-#define BROM_FILE_HEAD_SIZE_OFFSET  ((BROM_FILE_HEAD_BIT_20 << 31) | \
-                                    (BROM_FILE_HEAD_BIT_10_1 << 21) | \
-                                    (BROM_FILE_HEAD_BIT_11 << 20) | \
-                                    (BROM_FILE_HEAD_BIT_19_12 << 12))
-#define JUMP_INSTRUCTION        (BROM_FILE_HEAD_SIZE_OFFSET | 0x6f)
-#else
-/// ARM's bl instruction 
-#define BROM_FILE_HEAD_SIZE_OFFSET  (((sizeof(boot0_file_head_t) + sizeof(int) - 1) / sizeof(int) - 2))
-#define JUMP_INSTRUCTION        (BROM_FILE_HEAD_SIZE_OFFSET | 0xEA000000)
-#endif
-#ifdef __clang__
-// __attribute__((section (".header"))) 
-#endif 
-const boot0_file_head_t __attribute__((section (".boot0header.header")))  BT0_head = {
+const boot0_file_head_t header = {
     {
         /* jump_instruction*/
         JUMP_INSTRUCTION,
@@ -145,5 +115,3 @@ const boot0_file_head_t __attribute__((section (".boot0header.header")))  BT0_he
     .fes_union_addr.extd_head.magic = DRAM_EXT_MAGIC,
 #endif
 };
-
-_Static_assert(sizeof(BT0_head) == 0x03c8, "BT0 header size wrong!"); 

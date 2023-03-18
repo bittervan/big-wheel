@@ -5,8 +5,8 @@
  * wangwei <wangwei@allwinnertech.com>
  */
 
-#ifndef _SUN20IW1_H
-#define _SUN20IW1_H
+#ifndef _DEFS_H_
+#define _DEFS_H_
 
 #define BOOT_PUB_HEAD_VERSION  "3000"
 #define CONFIG_ARCH_SUN20IW1
